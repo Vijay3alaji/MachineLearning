@@ -15,7 +15,10 @@ class CustomException(Exception):
         self.error_details = error_details
 
     def __str__(self):
-        return error_message(self.error_message, self.error_details)
+        try:
+            return error_message(self.error_message, self.error_details)
+        except:
+            return str(self.error_message)
     
     
     
