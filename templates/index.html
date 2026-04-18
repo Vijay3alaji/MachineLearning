@@ -1,0 +1,837 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EduPredict — Student Exam Performance Indicator</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --ink: #0d0d0d;
+        --paper: #f5f0e8;
+        --accent: #e8431a;
+        --accent2: #1a5ce8;
+        --muted: #9a9085;
+        --border: #ddd8ce;
+        --white: #ffffff;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: "DM Sans", sans-serif;
+        background: var(--ink);
+        color: var(--white);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      /* ─── NOISE OVERLAY ─── */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.6;
+      }
+
+      /* ─── HERO ─── */
+      .hero {
+        position: relative;
+        z-index: 1;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 36px 48px 48px;
+        overflow: hidden;
+      }
+
+      /* Big decorative number */
+      .hero-bg-num {
+        position: absolute;
+        right: -40px;
+        top: 50%;
+        transform: translateY(-55%);
+        font-family: "Bebas Neue", sans-serif;
+        font-size: clamp(280px, 38vw, 520px);
+        line-height: 1;
+        color: transparent;
+        -webkit-text-stroke: 1px rgba(255, 255, 255, 0.06);
+        user-select: none;
+        pointer-events: none;
+        letter-spacing: -0.04em;
+      }
+
+      /* ─── NAV ─── */
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        animation: fadeDown 0.6s ease both;
+      }
+
+      .nav-logo {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 22px;
+        letter-spacing: 0.12em;
+        color: var(--white);
+        text-decoration: none;
+      }
+
+      .nav-logo span {
+        color: var(--accent);
+      }
+
+      .nav-pill {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        padding: 8px 18px;
+        border-radius: 100px;
+        font-size: 12px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .nav-pill .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #4dff91;
+        box-shadow: 0 0 6px #4dff91;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
+
+      /* ─── HERO CONTENT ─── */
+      .hero-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 60px 0 40px;
+      }
+
+      .eyebrow {
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        animation: fadeUp 0.7s ease 0.1s both;
+      }
+
+      .eyebrow::before {
+        content: "";
+        display: block;
+        width: 32px;
+        height: 1px;
+        background: var(--accent);
+      }
+
+      h1 {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: clamp(72px, 12vw, 148px);
+        line-height: 0.88;
+        letter-spacing: 0.01em;
+        max-width: 820px;
+        animation: fadeUp 0.7s ease 0.2s both;
+      }
+
+      h1 .outline {
+        -webkit-text-stroke: 1.5px var(--white);
+        color: transparent;
+      }
+
+      h1 .red {
+        color: var(--accent);
+      }
+
+      .hero-desc {
+        margin-top: 32px;
+        font-size: 16px;
+        font-weight: 300;
+        line-height: 1.7;
+        color: rgba(255, 255, 255, 0.55);
+        max-width: 420px;
+        animation: fadeUp 0.7s ease 0.3s both;
+      }
+
+      /* ─── CTA ─── */
+      .cta-row {
+        margin-top: 44px;
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        flex-wrap: wrap;
+        animation: fadeUp 0.7s ease 0.4s both;
+      }
+
+      .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 18px;
+        letter-spacing: 0.1em;
+        color: var(--ink);
+        background: var(--paper);
+        text-decoration: none;
+        padding: 16px 36px;
+        border-radius: 3px;
+        transition:
+          transform 0.15s,
+          box-shadow 0.15s,
+          background 0.2s;
+        box-shadow: 4px 4px 0 var(--accent);
+      }
+
+      .btn-primary:hover {
+        transform: translate(-3px, -3px);
+        box-shadow: 7px 7px 0 var(--accent);
+        background: var(--white);
+      }
+
+      .btn-primary .arrow {
+        font-size: 20px;
+        transition: transform 0.2s;
+      }
+
+      .btn-primary:hover .arrow {
+        transform: translateX(4px);
+      }
+
+      .btn-secondary {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.45);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: color 0.2s;
+      }
+
+      .btn-secondary:hover {
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      /* ─── HERO BOTTOM STRIP ─── */
+      .hero-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        flex-wrap: wrap;
+        gap: 20px;
+        animation: fadeUp 0.6s ease 0.5s both;
+      }
+
+      .stat-row {
+        display: flex;
+        gap: 48px;
+      }
+
+      .stat {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .stat-num {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 36px;
+        letter-spacing: 0.04em;
+        color: var(--white);
+        line-height: 1;
+      }
+
+      .stat-num span {
+        color: var(--accent);
+      }
+
+      .stat-label {
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .scroll-hint {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.25);
+      }
+
+      .scroll-arrow {
+        width: 28px;
+        height: 28px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        animation: bounce 2s infinite;
+      }
+
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(5px);
+        }
+      }
+
+      /* ─── FEATURES SECTION ─── */
+      .features {
+        position: relative;
+        z-index: 1;
+        background: var(--paper);
+        color: var(--ink);
+        padding: 80px 48px;
+      }
+
+      .features-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 56px;
+        gap: 32px;
+        flex-wrap: wrap;
+      }
+
+      .features-title {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: clamp(36px, 5vw, 56px);
+        line-height: 0.95;
+        letter-spacing: 0.02em;
+      }
+
+      .features-title span {
+        color: var(--accent);
+      }
+
+      .features-desc {
+        max-width: 320px;
+        font-size: 14px;
+        font-weight: 300;
+        line-height: 1.7;
+        color: var(--muted);
+        padding-top: 6px;
+      }
+
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2px;
+        background: var(--border);
+        border: 1.5px solid var(--border);
+      }
+
+      .feature-card {
+        background: var(--paper);
+        padding: 32px 28px;
+        transition: background 0.2s;
+      }
+
+      .feature-card:hover {
+        background: var(--white);
+      }
+
+      .feature-icon {
+        font-size: 28px;
+        margin-bottom: 20px;
+        display: block;
+      }
+
+      .feature-num {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 11px;
+        letter-spacing: 0.2em;
+        color: var(--muted);
+        margin-bottom: 10px;
+      }
+
+      .feature-name {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 22px;
+        letter-spacing: 0.04em;
+        color: var(--ink);
+        margin-bottom: 12px;
+      }
+
+      .feature-text {
+        font-size: 13px;
+        font-weight: 300;
+        line-height: 1.65;
+        color: var(--muted);
+      }
+
+      /* ─── HOW IT WORKS ─── */
+      .how {
+        position: relative;
+        z-index: 1;
+        background: var(--ink);
+        color: var(--white);
+        padding: 80px 48px;
+      }
+
+      .how-header {
+        margin-bottom: 56px;
+      }
+
+      .section-eyebrow {
+        font-size: 11px;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 16px;
+      }
+
+      .how-title {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: clamp(36px, 5vw, 56px);
+        letter-spacing: 0.02em;
+        line-height: 0.95;
+      }
+
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0;
+        position: relative;
+      }
+
+      .steps::before {
+        content: "";
+        position: absolute;
+        top: 28px;
+        left: 10%;
+        right: 10%;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.15),
+          transparent
+        );
+      }
+
+      .step {
+        padding: 0 24px 0 0;
+        position: relative;
+      }
+
+      .step-num {
+        width: 56px;
+        height: 56px;
+        border: 1.5px solid rgba(255, 255, 255, 0.15);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 22px;
+        color: var(--accent);
+        margin-bottom: 24px;
+        background: var(--ink);
+        position: relative;
+        z-index: 1;
+      }
+
+      .step-title {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 20px;
+        letter-spacing: 0.04em;
+        color: var(--white);
+        margin-bottom: 10px;
+      }
+
+      .step-text {
+        font-size: 13px;
+        font-weight: 300;
+        line-height: 1.65;
+        color: rgba(255, 255, 255, 0.4);
+      }
+
+      /* ─── FINAL CTA ─── */
+      .final-cta {
+        position: relative;
+        z-index: 1;
+        background: var(--accent);
+        padding: 80px 48px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 40px;
+        flex-wrap: wrap;
+        overflow: hidden;
+      }
+
+      .final-cta::before {
+        content: "GO";
+        position: absolute;
+        right: 40px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 240px;
+        color: rgba(0, 0, 0, 0.08);
+        line-height: 1;
+        pointer-events: none;
+      }
+
+      .final-cta-title {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: clamp(36px, 5vw, 62px);
+        color: white;
+        line-height: 0.95;
+        letter-spacing: 0.02em;
+      }
+
+      .final-cta-sub {
+        margin-top: 12px;
+        font-size: 15px;
+        font-weight: 300;
+        color: rgba(255, 255, 255, 0.75);
+      }
+
+      .btn-white {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 18px;
+        letter-spacing: 0.1em;
+        color: var(--accent);
+        background: white;
+        text-decoration: none;
+        padding: 16px 36px;
+        border-radius: 3px;
+        box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+        transition:
+          transform 0.15s,
+          box-shadow 0.15s;
+        white-space: nowrap;
+      }
+
+      .btn-white:hover {
+        transform: translate(-3px, -3px);
+        box-shadow: 7px 7px 0 rgba(0, 0, 0, 0.2);
+      }
+
+      /* ─── FOOTER ─── */
+      footer {
+        position: relative;
+        z-index: 1;
+        background: #080808;
+        padding: 28px 48px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .footer-logo {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 18px;
+        letter-spacing: 0.12em;
+        color: rgba(255, 255, 255, 0.3);
+        text-decoration: none;
+      }
+
+      .footer-logo span {
+        color: var(--accent);
+        opacity: 0.6;
+      }
+
+      .footer-right {
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.2);
+      }
+
+      /* ─── ANIMATIONS ─── */
+      @keyframes fadeDown {
+        from {
+          opacity: 0;
+          transform: translateY(-16px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* ─── RESPONSIVE ─── */
+      @media (max-width: 768px) {
+        .hero {
+          padding: 28px 24px 36px;
+        }
+        .features,
+        .how,
+        .final-cta,
+        footer {
+          padding: 56px 24px;
+        }
+        .features-grid {
+          grid-template-columns: 1fr;
+        }
+        .steps {
+          grid-template-columns: 1fr 1fr;
+          gap: 36px;
+        }
+        .stat-row {
+          gap: 28px;
+        }
+        .hero-bg-num {
+          display: none;
+        }
+        .features-header {
+          flex-direction: column;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .steps {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ═══════════════════════════ HERO ═══════════════════════════ -->
+    <section class="hero">
+      <div class="hero-bg-num">100</div>
+
+      <nav>
+        <a href="/" class="nav-logo">Edu<span>Predict</span></a>
+        <div class="nav-pill">
+          <span class="dot"></span>
+          ML Model Active
+        </div>
+      </nav>
+
+      <div class="hero-content">
+        <div class="eyebrow">Machine Learning · Education Analytics</div>
+
+        <h1>
+          PREDICT<br />
+          <span class="outline">STUDENT</span><br />
+          <span class="red">SCORES</span>
+        </h1>
+
+        <p class="hero-desc">
+          Enter a student's profile and subject scores to instantly predict
+          their expected mathematics performance using a trained regression
+          model.
+        </p>
+
+        <div class="cta-row">
+          <a href="/predict" class="btn-primary">
+            Start Predicting <span class="arrow">→</span>
+          </a>
+          <a href="#how" class="btn-secondary"> ↓ How it works </a>
+        </div>
+      </div>
+
+      <div class="hero-bottom">
+        <div class="stat-row">
+          <div class="stat">
+            <div class="stat-num">7<span>+</span></div>
+            <div class="stat-label">Input Features</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">100</div>
+            <div class="stat-label">Score Range</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">ML</div>
+            <div class="stat-label">Powered</div>
+          </div>
+        </div>
+
+        <div class="scroll-hint">
+          <div class="scroll-arrow">↓</div>
+          Scroll
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════ FEATURES ═══════════════════════════ -->
+    <section class="features">
+      <div class="features-header">
+        <div class="features-title">WHAT WE<br /><span>ANALYSE</span></div>
+        <p class="features-desc">
+          The model considers a combination of demographic, socioeconomic, and
+          academic factors to generate a reliable math score prediction.
+        </p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <span class="feature-icon">👤</span>
+          <div class="feature-num">01</div>
+          <div class="feature-name">Demographic Profile</div>
+          <p class="feature-text">
+            Gender and race/ethnicity are used as baseline demographic features
+            that correlate with educational outcomes in the dataset.
+          </p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">🎓</span>
+          <div class="feature-num">02</div>
+          <div class="feature-name">Parental Education</div>
+          <p class="feature-text">
+            A parent's highest level of education is one of the strongest
+            socioeconomic predictors of student academic performance.
+          </p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">🍱</span>
+          <div class="feature-num">03</div>
+          <div class="feature-name">Lunch Type</div>
+          <p class="feature-text">
+            Standard vs. free/reduced lunch serves as a proxy for household
+            income and access to resources, influencing learning outcomes.
+          </p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">📝</span>
+          <div class="feature-num">04</div>
+          <div class="feature-name">Test Prep Course</div>
+          <p class="feature-text">
+            Completion of a preparation course shows meaningful improvement in
+            predicted scores across all groups in the training data.
+          </p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">📖</span>
+          <div class="feature-num">05</div>
+          <div class="feature-name">Reading Score</div>
+          <p class="feature-text">
+            Reading ability is strongly correlated with mathematics performance.
+            Students who read well tend to understand problem statements better.
+          </p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">✏️</span>
+          <div class="feature-num">06</div>
+          <div class="feature-name">Writing Score</div>
+          <p class="feature-text">
+            Writing score reflects analytical thinking and structured reasoning
+            — skills that directly transfer to mathematical problem solving.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════ HOW IT WORKS ═══════════════════════════ -->
+    <section class="how" id="how">
+      <div class="how-header">
+        <div class="section-eyebrow">Process</div>
+        <div class="how-title">HOW IT<br />WORKS</div>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-title">Fill the Form</div>
+          <p class="step-text">
+            Enter the student's gender, ethnicity, parental education, lunch
+            type, test prep status, and their reading and writing scores.
+          </p>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div class="step-title">Preprocess</div>
+          <p class="step-text">
+            The inputs are encoded and scaled using the same preprocessor
+            pipeline that was fitted during model training.
+          </p>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div class="step-title">Model Inference</div>
+          <p class="step-text">
+            A trained regression model runs on the processed features to output
+            a continuous predicted mathematics score.
+          </p>
+        </div>
+        <div class="step">
+          <div class="step-num">04</div>
+          <div class="step-title">View Result</div>
+          <p class="step-text">
+            The predicted score is displayed instantly along with a performance
+            tier — Strong, Average, or Needs Support.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════ FINAL CTA ═══════════════════════════ -->
+    <section class="final-cta">
+      <div>
+        <div class="final-cta-title">READY TO<br />PREDICT?</div>
+        <p class="final-cta-sub">Takes less than 30 seconds.</p>
+      </div>
+      <a href="/predict" class="btn-white"> Open Predictor → </a>
+    </section>
+
+    <!-- ═══════════════════════════ FOOTER ═══════════════════════════ -->
+    <footer>
+      <a href="/" class="footer-logo">Edu<span>Predict</span></a>
+      <div class="footer-right">Built with Flask · Scikit-learn · Python</div>
+    </footer>
+  </body>
+</html>
