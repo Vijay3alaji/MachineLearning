@@ -10,10 +10,7 @@
 
 | Landing Page | Prediction Form | Result |
 |---|---|---|
-| ![Home](<img width="745" height="948" alt="image" src="https://github.com/user-attachments/assets/cf66fd5e-a1ca-42c7-8a52-574d375ca154" />
-) | ![Form](<img width="1148" height="871" alt="image" src="https://github.com/user-attachments/assets/74c4ab28-90d6-4837-8ac7-83ae3e3db5da" />
-) | ![Result]() |
-
+| ![Home](https://github.com/user-attachments/assets/cf66fd5e-a1ca-42c7-8a52-574d375ca154) | ![Form](https://github.com/user-attachments/assets/74c4ab28-90d6-4837-8ac7-83ae3e3db5da) | ![Result](https://github.com/user-attachments/assets/06d38a1e-a464-48ce-8740-29dabab2a591) |
 
 ---
 
