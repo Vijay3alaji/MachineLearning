@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 
 # Step 1: create logs folder
-LOG_DIR = "logs"
+LOG_DIR = "/tmp/logs"
 os.makedirs(LOG_DIR, exist_ok=True)
 
 # Step 2: create log file name
